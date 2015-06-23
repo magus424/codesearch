@@ -12,9 +12,8 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
-
-	"github.com/junkblocker/codesearch/index"
-	"github.com/junkblocker/codesearch/regexp"
+	"github.com/magus424/codesearch/index"
+	"github.com/magus424/codesearch/regexp"
 )
 
 var usageMessage = `usage: csearch [options] regexp
