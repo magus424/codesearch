@@ -12,8 +12,7 @@ import (
 	"log"
 	"os"
 	"runtime/pprof"
-
-	"github.com/junkblocker/codesearch/regexp"
+	"github.com/magus424/codesearch/regexp"
 )
 
 var usageMessage = `usage: cgrep [-c] [-h] [-i] [-l [-0]] [-n] regexp [file...]
