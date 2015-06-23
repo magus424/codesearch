@@ -17,8 +17,7 @@ import (
 	"runtime/pprof"
 	"sort"
 	"strings"
-
-	"github.com/junkblocker/codesearch/index"
+	"github.com/magus424/codesearch/index"
 )
 
 const (
