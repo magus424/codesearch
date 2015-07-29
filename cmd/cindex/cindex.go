@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"runtime/pprof"
 	"sort"
 	"strings"
@@ -52,7 +53,7 @@ Options:
   -maxinvalidutf8ratio RATIO
                skip indexing a file if it has more than this ratio of invalid UTF-8 sequences (Default: %v)
   -exclude FILE
-               path to file containing a list of file patterns to exclude from indexing
+               path to file containing a list of path regexp patterns to exclude from indexing
 
 cindex prepares the trigram index for use by csearch.  The index is the
 file named by $CSEARCHINDEX, or else $HOME/.csearchindex.
@@ -88,14 +89,14 @@ func usage() {
 }
 
 var (
-	listFlag             = flag.Bool("list", false, "list indexed paths and exit")
-	resetFlag            = flag.Bool("reset", false, "discard existing index")
-	verboseFlag          = flag.Bool("verbose", false, "print extra information")
-	cpuProfile           = flag.String("cpuprofile", "", "write cpu profile to this file")
-	indexPath            = flag.String("indexpath", "", "specifies index path")
-	logSkipFlag          = flag.Bool("logskip", false, "print why a file was skipped from indexing")
-	noFollowSymlinksFlag = flag.Bool("no-follow-symlinks", false, "do not follow symlinked files and directories")
-	exclude              = flag.String("exclude", "", "path to file containing a list of file patterns to exclude from indexing")
+	listFlag             = flag.Bool("list",               false,               "list indexed paths and exit")
+	resetFlag            = flag.Bool("reset",              false,               "discard existing index")
+	verboseFlag          = flag.Bool("verbose",            false,               "print extra information")
+	cpuProfile           = flag.String("cpuprofile",       "",                  "write cpu profile to this file")
+	indexPath            = flag.String("indexpath",        "",                  "specifies index path")
+	logSkipFlag          = flag.Bool("logskip",            false,               "print why a file was skipped from indexing")
+	noFollowSymlinksFlag = flag.Bool("no-follow-symlinks", true,                "do not follow symlinked files and directories")
+	exclude              = flag.String("exclude",          "~/.csearchexclude", "path to file containing a list of path regexp patterns to exclude from indexing")
 	// Tuning variables for detecting text files.
 	// A file is assumed not to be text files (and thus not indexed) if
 	// 1) if it contains an invalid UTF-8 sequences
@@ -118,12 +119,14 @@ func walk(arg string, symlinkFrom string, out chan string, logskip bool) {
 		if basedir, elem := filepath.Split(path); elem != "" {
 			exclude := false
 			for _, pattern := range excludePatterns {
-				exclude, err = filepath.Match(pattern, elem)
-				if err != nil {
-					log.Fatal(err)
-				}
-				if exclude {
-					break
+				if pattern != "" {
+					exclude, err = regexp.MatchString(pattern, path)
+					if err != nil {
+						log.Fatal(err)
+					}
+					if exclude {
+						break
+					}
 				}
 			}
 
