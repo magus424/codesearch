@@ -3,6 +3,7 @@
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+// vim: noet
 
 package main
 
@@ -149,7 +150,7 @@ func walk(arg string, symlinkFrom string, out chan string, logskip bool) {
 					}
 					return nil
 				}
-				if info != nil && info.Mode()&os.ModeSymlink != 0 {
+				if info != nil && info.Mode() & os.ModeSymlink != 0 {
 					if *noFollowSymlinksFlag {
 						if logskip {
 							log.Printf("%s: skipped. Symlink", path)
